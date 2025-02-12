@@ -1,0 +1,10 @@
+--- build/src/lammps.cpp	2016-05-12 08:54:17.000000000 -0500
++++ build/src/lammps.cpp	2025-02-12 16:52:10.525996425 -0600
+@@ -104,6 +104,7 @@ LAMMPS::LAMMPS(int narg, char **arg, MPI_Comm communicator)
+ 
+   int iarg = 1;
+   while (iarg < narg) {
++    fprintf(universe->uscreen, "INFO[AAYUSH]: [%s]\n", arg[iarg]);
+     if (strcmp(arg[iarg],"-partition") == 0 ||
+         strcmp(arg[iarg],"-p") == 0) {
+       universe->existflag = 1;
