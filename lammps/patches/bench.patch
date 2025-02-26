@@ -1,5 +1,5 @@
---- a/build/src/lammps.cpp
-+++ b/build/src/lammps.cpp
+--- build/src/lammps.cpp
++++ build/src/lammps.cpp
 @@ -53,6 +53,46 @@ using namespace LAMMPS_NS;
  
  static void print_style(FILE *fp, const char *str, int &pos);
