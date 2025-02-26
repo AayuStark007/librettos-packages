@@ -1,0 +1,101 @@
+--- a/build/src/lammps.cpp
++++ b/build/src/lammps.cpp
+@@ -53,6 +53,46 @@ using namespace LAMMPS_NS;
+ 
+ static void print_style(FILE *fp, const char *str, int &pos);
+ 
++static const char *BENCH_LJ = R"(
++# 3d Lennard-Jones melt
++
++variable	x index 1
++variable	y index 1
++variable	z index 1
++
++variable	xx equal 20*$x
++variable	yy equal 20*$y
++variable	zz equal 20*$z
++
++units		lj
++atom_style	atomic
++
++lattice		fcc 0.8442
++region		box block 0 ${xx} 0 ${yy} 0 ${zz}
++create_box	1 box
++create_atoms	1 box
++mass		1 1.0
++
++velocity	all create 1.44 87287 loop geom
++
++pair_style	lj/cut 2.5
++pair_coeff	1 1 1.0 1.0 2.5
++
++neighbor	0.3 bin
++neigh_modify	delay 0 every 20 check no
++
++fix		1 all nve
++
++run		100
++)";
++
++static const char* lookup_bench_script(const char *name) 
++{
++  if (strcmp(name, "lj") == 0) return BENCH_LJ;
++  // TODO: add more benchmarks
++  return nullptr;
++}
++
+ /* ----------------------------------------------------------------------
+    start up LAMMPS
+    allocate fundamental classes (memory, error, universe, input)
+@@ -87,6 +127,10 @@ LAMMPS::LAMMPS(int narg, char **arg, MPI_Comm communicator)
+   int citeflag = 1;
+   int helpflag = 0;
+ 
++  // custom flags
++  int benchflag = 0;
++  char *benchname = nullptr;
++
+   suffix = suffix2 = NULL;
+   suffix_enable = 0;
+   if (arg) exename = arg[0];
+@@ -104,7 +148,15 @@ LAMMPS::LAMMPS(int narg, char **arg, MPI_Comm communicator)
+ 
+   int iarg = 1;
+   while (iarg < narg) {
+-    if (strcmp(arg[iarg],"-partition") == 0 ||
++    // parse -bench
++    if (strcmp(arg[iarg], "-bench") == 0) {
++      if (iarg+2 > narg)
++        error->universe_all(FLERR,"Invalid command-line argument");
++      benchflag = 1;
++      benchname = arg[iarg+1];
++      iarg += 2;
++      continue;
++    } else if (strcmp(arg[iarg],"-partition") == 0 ||
+         strcmp(arg[iarg],"-p") == 0) {
+       universe->existflag = 1;
+       if (iarg+2 > narg)
+@@ -319,8 +371,21 @@ LAMMPS::LAMMPS(int narg, char **arg, MPI_Comm communicator)
+     world = universe->uworld;
+ 
+     if (universe->me == 0) {
+-      if (inflag == 0) infile = stdin;
+-      else infile = fopen(arg[inflag],"r");
++      if (benchflag) {
++        // open file from mem or tmpfile
++        const char *script_text = lookup_bench_script(benchname);
++        if (!script_text) {
++          error->one(FLERR, "Unknown -bench name");
++        }
++        infile = fmemopen((void*)script_text, strlen(script_text), "r");
++        if (!infile) {
++          error->one(FLERR, "Failed to open in-memory file");
++        }
++      } else if (inflag == 0) {
++        infile = stdin;
++      } else {
++        infile = fopen(arg[inflag],"r");
++      }
+       if (infile == NULL) {
+         char str[128];
+         sprintf(str,"Cannot open input script %s",arg[inflag]);
