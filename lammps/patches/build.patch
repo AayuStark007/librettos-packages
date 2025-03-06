@@ -1,24 +1,23 @@
---- build/src/MAKE/Makefile.serial	2016-05-12 08:54:17.000000000 -0500
-+++ build/src/MAKE/Makefile.serial	2025-01-18 21:22:10.525996425 -0600
-@@ -6,17 +6,17 @@
+--- build/src/MAKE/Makefile.serial
++++ build/src/MAKE/Makefile.serial
+@@ -6,17 +6,17 @@ SHELL = /bin/sh
  # compiler/linker settings
  # specify flags and libraries needed for your compiler
- 
+
 -CC =		g++
 -CCFLAGS =	-g -O3
-+#CC =      g++
++# CC =		g++
 +CCFLAGS =	-g -O3 -fpermissive
  SHFLAGS =	-fPIC
  DEPFLAGS =	-M
- 
+
 -LINK =		g++
-+#LINK =     g++
++# LINK =		g++
  LINKFLAGS =	-g -O
- LIB = 
+ LIB =
  SIZE =		size
- 
+
 -ARCHIVE =	ar
-+#ARCHIVE =	ar
++# ARCHIVE =	ar
  ARFLAGS =	-rc
- SHLIBFLAGS =	-shared
- 
+ SHLIBFLAGS =	-shared -rdynamic

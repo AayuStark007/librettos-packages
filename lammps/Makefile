@@ -1,6 +1,6 @@
 include ../Makefile.inc
 
-UPSTREAM=https://download.lammps.org/tars/lammps-17Nov2016.tar.gz
+UPSTREAM=https://download.lammps.org/tars/lammps-20Sep2021.tar.gz # https://download.lammps.org/tars/lammps-17Nov2016.tar.gz
 TARBALL=$(notdir $(UPSTREAM))
 
 CC=$(RUMPRUN_CC) -L${RUMPRUN_SYSROOT}/../../obj-amd64-nrk/lib/libunwind/
