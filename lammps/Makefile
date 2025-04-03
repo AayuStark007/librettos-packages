@@ -7,13 +7,19 @@ CC=$(RUMPRUN_CC) -L${RUMPRUN_SYSROOT}/../../obj-amd64-nrk/lib/libunwind/
 CXX=$(RUMPRUN_CXX) -L${RUMPRUN_SYSROOT}/../../obj-amd64-nrk/lib/libunwind/
 LINK=$(RUMPRUN_CXX) -L${RUMPRUN_SYSROOT}/../../obj-amd64-nrk/lib/libunwind/
 ARCHIVE=$(RUMPRUN_TOOLCHAIN_TUPLE)-ar
-export CC CXX LINK ARCHIVE
+export CC CXX LINK ARCHIVE RUMPRUN_PKGS_DIR
 
-all: $(RUMPRUN_PKGS_DIR)/lib/libevent.a build/configure build/Makefile_omp images
+OPENMP_LIB=../openmp/libgomp.a
 
-.NOTPARALLEL: $(RUMPRUN_PKGS_DI)/lib/libevent.a
+all: $(RUMPRUN_PKGS_DIR)/lib/libevent.a $(RUMPRUN_PKGS_DIR)/lib/libgomp.a build/configure build/Makefile_omp images
+
+.NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libevent.a
 $(RUMPRUN_PKGS_DIR)/lib/libevent.a:
 	$(MAKE) -C ../libevent
+
+.NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libgomp.a
+$(RUMPRUN_PKGS_DIR)/lib/libgomp.a:
+	$(MAKE) -C ../openmp
 
 build/stamp_patch:
 	(cd build && ../../scripts/apply-patches.sh ./ ../patches/*)
@@ -21,11 +27,11 @@ build/stamp_patch:
 
 .PHONY: build/Makefile
 build/Makefile: build/stamp_patch
-	(cd build/src; make serial)
+	(cd build/src; $(MAKE) serial)
 
 .PHONY: build/Makefile_omp
 build/Makefile_omp: build/prepare_Omp
-	(cd build/src; make omp_nrk)
+	(cd build/src; $(MAKE) omp_nrk)
 
 dl/$(TARBALL):
 	mkdir -p dl
@@ -40,7 +46,7 @@ build/prepare_Stubs: build/stamp_patch
 
 build/prepare_Omp: build/prepare_Stubs
 	cp makefiles/Makefile.omp_nrk build/src/MAKE/MINE/Makefile.omp_nrk
-	(cd build/src; make yes-user-omp)
+	(cd build/src; $(MAKE) yes-user-omp)
 	(cd build/src; sh ./USER-OMP/hack_openmp_for_pgi.sh)
 
 .PHONY: images

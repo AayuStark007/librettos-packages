@@ -43,9 +43,9 @@ LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_MEMALIGN=64
 # MPI_PATH = 
 # MPI_LIB =	
 
-MPI_INC =       -I../STUBS 
-MPI_PATH =      -L../STUBS
-MPI_LIB =	-lmpi_stubs
+MPI_INC =       -I../STUBS -I$(RUMPRUN_PKGS_DIR)/include
+MPI_PATH =      -L../STUBS -L$(RUMPRUN_PKGS_DIR)/lib
+MPI_LIB =	-lmpi_stubs -lpthread -lgomp
 
 # FFT library
 # see discussion in Section 2.2 (step 6) of manual
