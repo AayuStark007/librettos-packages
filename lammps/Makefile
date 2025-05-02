@@ -26,7 +26,7 @@ build/stamp_patch:
 	touch $@
 
 .PHONY: build/Makefile
-build/Makefile: build/stamp_patch
+build/Makefile:
 	(cd build/src; $(MAKE) serial)
 
 .PHONY: build/Makefile_omp
@@ -37,11 +37,11 @@ dl/$(TARBALL):
 	mkdir -p dl
 	../scripts/fetch.sh ${UPSTREAM} dl/$(TARBALL)
 
-build/configure: | dl/$(TARBALL)
-	mkdir -p build
-	(cd build && tar -xz --strip-components 1 -f ../dl/$(TARBALL))
+build/configure:
+	git clone https://github.com/AayuStark007/lammps.git build
+	(cd build && git checkout lmp2016)
 
-build/prepare_Stubs: build/stamp_patch
+build/prepare_Stubs:
 	(cd build/src/STUBS; make clean && make)
 
 build/prepare_Omp: build/prepare_Stubs
