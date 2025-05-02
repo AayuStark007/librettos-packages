@@ -34,6 +34,7 @@ dl/$(TARBALL):
 	../scripts/fetch.sh ${UPSTREAM} dl/$(TARBALL)
 
 build/configure:
+	rm -rf build
 	git clone --depth=1 https://github.com/AayuStark007/lammps.git -b lmp2016 build
 
 build/prepare_Stubs:
