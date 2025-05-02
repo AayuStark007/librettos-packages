@@ -21,10 +21,6 @@ $(RUMPRUN_PKGS_DIR)/lib/libevent.a:
 $(RUMPRUN_PKGS_DIR)/lib/libgomp.a:
 	$(MAKE) -C ../openmp
 
-build/stamp_patch:
-	(cd build && ../../scripts/apply-patches.sh ./ ../patches/*)
-	touch $@
-
 .PHONY: build/Makefile
 build/Makefile:
 	(cd build/src; $(MAKE) serial)
@@ -38,14 +34,12 @@ dl/$(TARBALL):
 	../scripts/fetch.sh ${UPSTREAM} dl/$(TARBALL)
 
 build/configure:
-	git clone https://github.com/AayuStark007/lammps.git build
-	(cd build && git checkout lmp2016)
+	git clone --depth=1 https://github.com/AayuStark007/lammps.git -b lmp2016 build
 
 build/prepare_Stubs:
 	(cd build/src/STUBS; make clean && make)
 
 build/prepare_Omp: build/prepare_Stubs
-	cp makefiles/Makefile.omp_nrk build/src/MAKE/MINE/Makefile.omp_nrk
 	(cd build/src; $(MAKE) yes-user-omp)
 	(cd build/src; sh ./USER-OMP/hack_openmp_for_pgi.sh)
 
